@@ -1,39 +1,18 @@
-import string
-import os
+from flashtext import KeywordProcessor
 
-# directory of text files
+
 directory = ""
+searchterms = []
+keyword_processor = KeywordProcessor()
+dirtotal = []
+for filename in os.listdir(directory):
+    keyword_processor.add_keywords_from_list(searchterms)
+    file = open(os.path.join(directory, filename), 'r')
+    read = file.read()
+    keywords_found = keyword_processor.extract_keywords(read, span_info=True)
+    dirtotal = dirtotal+keywords_found
 
-#list of search terms
-searchterms = ['', '']
-
-def wordcount(filename, searchterms):
-    try:
-        dircount = 0
-        file = open(os.path.join(directory, filename), 'r')
-        read = file.readlines()
-        file.close()
-        results = []
-        for word in searchterms:
-            lower = word.lower()
-            count = 0
-            for line in read:
-                l = line.split()
-                for t in l:
-                    t = t.lower()
-                    t = ''.join(w for w in t if w not in string.punctuation)
-                    if t == lower:
-                        count += 1
-            results.append((word, count))
-        return(results)
-    except FileExistsError:
-        print('file not there')
-
-for s in searchterms:
-    dircount = 0
-    for filename in os.listdir(directory):
-        file_word_counts = wordcount(filename, searchterms)
-        for (a,b) in file_word_counts:
-            if s == a:
-                dircount += b
-    print (s, dircount)
+dictionary_freq = {}
+for a, b, c in dirtotal:
+    dictionary_freq[a] = dictionary_freq.get(a, 0) + 1
+print(dictionary_freq)
